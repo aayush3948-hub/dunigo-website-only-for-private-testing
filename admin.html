@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Dunigo Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #020617; --primary: #0ea5e9; --border: rgba(255, 255, 255, 0.08); }
+        body { background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; }
+        h1 { margin-bottom: 30px; font-weight: 800; color: var(--primary); }
+        
+        table { width: 100%; border-collapse: collapse; background: rgba(15, 23, 42, 0.6); border-radius: 15px; overflow: hidden; display: none; border: 1px solid var(--border); }
+        th, td { padding: 18px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: rgba(14, 165, 233, 0.1); color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        tr:hover { background: rgba(255, 255, 255, 0.03); }
+        
+        /* Buttons */
+        .view-btn { background: var(--primary); color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: 0.3s; }
+        .interview-btn { background: #22c55e; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-left: 8px; transition: 0.3s; }
+        
+        /* Naya Reject Button Style */
+        .reject-btn { background: #ef4444; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-left: 8px; transition: 0.3s; }
+        
+        .view-btn:hover, .interview-btn:hover, .reject-btn:hover { opacity: 0.8; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        
+        /* Status Tags */
+        .status-tag { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: 700; display: inline-block; }
+        .pending { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+        .scheduled { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        
+        /* Naya Rejected Tag Style */
+        .rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        
+        #loadingMsg { text-align: center; margin-top: 50px; color: #94a3b8; font-size: 1.2rem; }
+        .time-info { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; display: block; }
+    </style>
+</head>
+<body>
+
+    <h1>Job Applications Dashboard 🚀</h1>
+    
+    <div id="loadingMsg">Verifying Admin Access...</div>
+
+    <table id="adminTable">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Role & Experience</th>
+                <th>Current Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="appTableBody"></tbody>
+    </table>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+            authDomain: "dunigo-977a6.firebaseapp.com",
+            projectId: "dunigo-977a6",
+            appId: "1:728896139433:web:6b2026924b159fce7179b8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const ADMIN_EMAIL = "aayush3268@gmail.com"; 
+
+        onAuthStateChanged(auth, (user) => {
+            const loadingMsg = document.getElementById("loadingMsg");
+            const adminTable = document.getElementById("adminTable");
+
+            if (!user) {
+                window.location.href = "login.html";
+            } else if (user.email !== ADMIN_EMAIL) {
+                loadingMsg.innerHTML = `<h2 style="color:#ef4444;">Access Denied!</h2><p>Logged in as ${user.email}. You are not authorized.</p>`;
+            } else {
+                loadingMsg.style.display = "none";
+                adminTable.style.display = "table";
+                loadData();
+            }
+        });
+
+        function loadData() {
+            onSnapshot(collection(db, "applications"), (snapshot) => {
+                const tbody = document.getElementById("appTableBody");
+                tbody.innerHTML = "";
+
+                snapshot.forEach((snap) => {
+                    const data = snap.data();
+                    const tr = document.createElement("tr");
+
+                    // Status classes check
+                    let statusClass = "pending";
+                    if(data.status === "Interview Scheduled") statusClass = "scheduled";
+                    if(data.status === "Rejected") statusClass = "rejected";
+
+                    tr.innerHTML = `
+                        <td>
+                            <div style="font-weight:800; font-size: 1rem;">${data.applicantName || 'Anonymous'}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8">${data.applicantEmail}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:600">${data.jobRole || 'N/A'}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8">${data.experience || '0'} Years Exp.</div>
+                        </td>
+                        <td>
+                            <span class="status-tag ${statusClass}">
+                                ${data.status || 'Pending'}
+                            </span>
+                            ${data.interviewTime ? `<span class="time-info">📅 ${data.interviewTime}</span>` : ''}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPDF('${snap.id}')">Resume</button>
+                            <button class="interview-btn" onclick="setInterview('${snap.id}')">Fix Interview</button>
+                            <button class="reject-btn" onclick="rejectApp('${snap.id}')">Reject</button>
+                        </td>
+                    `;
+                    
+                    window[`resume_${snap.id}`] = data.resumeData;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        window.openPDF = (id) => {
+            const base64Data = window[`resume_${id}`];
+            if (!base64Data) return alert("Resume not found!");
+            const win = window.open();
+            win.document.write('<iframe src="' + base64Data + '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>');
+        };
+
+        // REJECT FUNCTION
+        window.rejectApp = async (docId) => {
+            if (confirm("Are you sure you want to reject this application? This will be reflected on the user's dashboard.")) {
+                try {
+                    const appRef = doc(db, "applications", docId);
+                    await updateDoc(appRef, { 
+                        status: "Rejected",
+                        interviewTime: "" // Clear any previous interview time
+                    });
+                    alert("Application Rejected! ❌");
+                } catch (err) {
+                    alert("Error: " + err.message);
+                }
+            }
+        };
+
+        window.setInterview = async (docId) => {
+            const interviewDateTime = prompt("Enter Interview Date & Time (e.g., 5th May, 2:30 PM):");
+            if (!interviewDateTime) return; 
+
+            if (confirm(`Confirm scheduling for: ${interviewDateTime}?`)) {
+                try {
+                    const appRef = doc(db, "applications", docId);
+                    await updateDoc(appRef, { 
+                        status: "Interview Scheduled",
+                        interviewTime: interviewDateTime 
+                    });
+                    alert("Success! Interview fixed.");
+                } catch (err) {
+                    alert("Error: " + err.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

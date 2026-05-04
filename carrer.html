@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers | Dunigo Logistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #0ea5e9;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            background-image: radial-gradient(circle at 50% -20%, #0c4a6e 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 5% 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero p { color: #94a3b8; font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+
+        /* Jobs Container */
+        .jobs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5% 100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        /* Job Card - matching your fields */
+        .job-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .job-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 30px 60px rgba(14, 165, 233, 0.15);
+        }
+
+        .company-name {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .role-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #f8fafc;
+        }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+        }
+
+        .apply-btn {
+            background: #fff;
+            color: #020617;
+            padding: 16px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 800;
+            text-align: center;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .apply-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.4);
+        }
+
+        /* Skeleton Loading */
+        .shimmer {
+            height: 300px;
+            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 32px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        /* Modal Background */
+#applyModal {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(2, 6, 23, 0.9); 
+    backdrop-filter: blur(10px);
+    z-index: 1000; 
+    padding: 20px;
+}
+/* Modal Content Box */
+.modal-content {
+    max-width: 500px; 
+    margin: 30px auto; 
+    background: #0f172a; 
+    padding: 30px; 
+    border-radius: 28px; 
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.modal-input {
+    width: 100%; 
+    padding: 12px; 
+    background: #020617; 
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    color: white; 
+    margin-bottom: 15px;
+    outline: none;
+}
+.modal-input:focus { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <h1>Career at <span>Dunigo</span></h1>
+        <p>Your field study helped us identify the best roles. Come join our remote-first team.</p>
+    </section>
+
+    <div class="jobs-container" id="jobsGrid">
+        <div class="shimmer"></div>
+        <div class="shimmer"></div>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+        authDomain: "dunigo-977a6.firebaseapp.com",
+        projectId: "dunigo-977a6",
+        storageBucket: "dunigo-977a6.firebasestorage.app",
+        messagingSenderId: "728896139433",
+        appId: "1:728896139433:web:6b2026924b159fce7179b8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let selectedJobInfo = {}; // Store ID and Title
+
+    // Check if user is logged in
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if(user && document.getElementById('appEmailID')){
+            document.getElementById('appEmailID').value = user.email;
+        }
+    });
+
+    // Load Jobs from Firestore
+    onSnapshot(collection(db, "jobs"), (snapshot) => {
+        const grid = document.getElementById("jobsGrid");
+        grid.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const card = document.createElement("div");
+            card.className = "job-card";
+            card.innerHTML = `
+                <div>
+                    <div class="company-name">${data.company || "Dunigo"}</div>
+                    <h2 class="role-title">${data.role}</h2>
+                    <div class="location-tag">${data.location}</div>
+                </div>
+                <button class="apply-btn" onclick="openApplyModal('${doc.id}', '${data.role}')">Apply for this Role</button>
+            `;
+            grid.appendChild(card);
+        });
+    });
+
+    // Open Modal Logic
+    window.openApplyModal = (id, role) => {
+        if (!currentUser) {
+            alert("Please Login First!");
+            window.location.href = "login.html";
+            return;
+        }
+        selectedJobInfo = { id, role };
+        document.getElementById("modalJobTitle").innerText = "Apply for " + role;
+        document.getElementById("applyModal").style.display = "block";
+    };
+
+    window.closeModal = () => {
+        document.getElementById("applyModal").style.display = "none";
+    };
+
+    // Submit Application to Firestore
+    window.submitApplication = async () => {
+        const name = document.getElementById("appFullName").value;
+        const email = document.getElementById("appEmailID").value;
+        const resumeFile = document.getElementById("appResume").files[0];
+        
+        if(!name || !email) return alert("Please Fill your Name and Email ID!");
+        if(!resumeFile) return alert("Please upload your resume (PDF)!");
+
+        const submitBtn = document.querySelector(".modal-content .apply-btn");
+        submitBtn.innerText = "Processing...";
+        submitBtn.disabled = true;
+
+        // FileReader to convert PDF to Base64 string
+        const reader = new FileReader();
+        reader.readAsDataURL(resumeFile);
+        reader.onload = async () => {
+            try {
+                const base64Resume = reader.result;
+
+                await addDoc(collection(db, "applications"), {
+                    jobId: selectedJobInfo.id,
+                    jobRole: selectedJobInfo.role,
+                    applicantEmail: email,
+                    applicantName: name,
+                    experience: document.getElementById("appExp").value,
+                    phone: document.getElementById("appPhone").value,
+                    authorized: document.getElementById("appAuth").value,
+                    resumeData: base64Resume, // PDF saved as string
+                    appliedAt: new Date()
+                });
+
+                // Redirect to success page
+                window.location.href = "success.html";
+            } catch (err) {
+                alert("Error: " + err.message);
+                submitBtn.innerText = "Submit Application";
+                submitBtn.disabled = false;
+                window.setInterview = async (docId) => {
+    const appRef = doc(db, "applications", docId);
+    const snap = await getDoc(appRef);
+    const data = snap.data();
+
+    const time = prompt("Interview Date & Time:");
+    if (!time) return;
+
+    if (confirm("Confirm and Send Automatic Email?")) {
+        // 1. Firestore Update
+        await updateDoc(appRef, { status: "Interview Scheduled", interviewTime: time });
+
+        // 2. FREE AUTOMATIC EMAIL (Google Script)
+        fetch("https://script.google.com/macros/s/AKfycbzg3Q9J9jgfxRXqZYHRfPCSv8ooqoQReryycf6843FLgmKrkxtgBUG5v8yiN5DYYPII/exec", {
+            method: "POST",
+            body: JSON.stringify({
+                email: data.applicantEmail,
+                subject: "Interview Scheduled | Dunigo",
+                message: `<h3>Hi ${data.applicantName},</h3><p>Apka interview ${time} ko fix ho gaya hai.</p>`
+            })
+        }).then(() => alert("Email Sent Automatically! ✨"));
+    }
+};
+            }
+        };
+    };
+</script>
+    <div id="applyModal">
+    <div class="modal-content">
+        <h2 id="modalJobTitle" style="margin-bottom: 20px; font-size: 1.5rem;">Apply for Role</h2>
+        
+        <label style="font-size: 0.8rem; color: #94a3b8;">Full Name</label>
+        <input type="text" id="appFullName" class="modal-input" placeholder="Enter your name">
+        <label style="font-size: 0.8rem; color: #94a3b8;">Email ID</label>
+        <input type="text" id="appEmailID" class="modal-input" placeholder="Enter your Email ID">
+
+        <label style="font-size: 0.8rem; color: #94a3b8;">Experience (Years)</label>
+        <input type="number" id="appExp" class="modal-input" placeholder="e.g. 2">
+        <label>Upload Resume (PDF only)</label>
+            <input type="file" id="appResume" class="modal-input" accept=".pdf"></label>
+
+        <label style="font-size: 0.8rem; color: #94a3b8;">Mobile Number</label>
+        <input type="tel" id="appPhone" class="modal-input" placeholder="+91...">
+
+        <label style="font-size: 0.8rem; color: #94a3b8;">Authorized to work in India?</label>
+        
+        <select id="appAuth" class="modal-input">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <button class="apply-btn" onclick="submitApplication()" style="width: 100%;">Submit Application</button>
+        <button onclick="closeModal()" style="width: 100%; background: transparent; color: #94a3b8; border: none; margin-top: 10px; cursor: pointer;">Cancel</button>
+    </div>
+</div>
+</body>
+</html>

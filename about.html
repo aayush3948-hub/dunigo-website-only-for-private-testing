@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Dunigo | Engineering the Future</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg); color: white; overflow-x: hidden; line-height: 1.6; }
+
+        /* --- HEADER (Same Branding) --- */
+        header {
+            padding: 20px 8%; display: flex; justify-content: space-between; align-items: center;
+            position: fixed; top: 0; width: 100%; background: rgba(5,5,5,0.8); backdrop-filter: blur(15px); z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+        .logo span { color: white; }
+
+        nav a { color: #94a3b8; text-decoration: none; margin-left: 30px; font-weight: 600; transition: 0.3s; }
+        nav a:hover { color: var(--primary); }
+
+        /* --- REVEAL ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(50px); transition: 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- HERO SECTION --- */
+        .about-hero {
+            height: 80vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; position: relative;
+        }
+        .about-hero h1 { font-size: 5.5rem; font-weight: 800; letter-spacing: -3px; }
+        .gradient-text { background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- FOUNDER SECTION --- */
+        .founder-container {
+            padding: 100px 10%; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+        }
+        .founder-image-box {
+            position: relative; height: 500px; background: linear-gradient(45deg, #111, #000);
+            border-radius: 30px; border: 1px solid var(--border); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .founder-image-box::before {
+            content: "IIT DELHI • CSE"; position: absolute; top: 20px; right: 20px;
+            background: var(--primary); color: black; padding: 5px 15px; font-weight: 800; border-radius: 5px; font-size: 0.7rem;
+        }
+        .founder-image-box span { font-size: 8rem; filter: grayscale(1); }
+
+        .founder-text h2 { font-size: 3rem; margin-bottom: 15px; }
+        .founder-text h4 { color: var(--primary); margin-bottom: 25px; letter-spacing: 2px; }
+        .founder-text p { color: #94a3b8; font-size: 1.1rem; margin-bottom: 20px; }
+
+        /* --- DUNIGO VISION SECTION --- */
+        .vision-section {
+            background: var(--glass); margin: 50px 5%; padding: 100px; border-radius: 50px;
+            border: 1px solid var(--border); text-align: center;
+        }
+        .vision-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px;
+        }
+        .vision-card {
+            padding: 40px; background: #0a0a0a; border-radius: 25px; border: 1px solid var(--border);
+            transition: 0.4s;
+        }
+        .vision-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .vision-card h3 { color: var(--primary); margin-bottom: 15px; }
+
+        /* --- TIMELINE ANIMATION --- */
+        .timeline { padding: 100px 10%; text-align: center; }
+        .year-tag { font-size: 6rem; font-weight: 900; opacity: 0.1; line-height: 1; }
+
+        /* --- FOOTER --- */
+        footer { padding: 60px; text-align: center; color: #444; border-top: 1px solid #111; }
+
+        /* Floating elements animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .orb {
+            position: absolute; width: 300px; height: 300px; 
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.05) 0%, transparent 70%);
+            border-radius: 50%; z-index: -1; animation: float 6s infinite ease-in-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="orb" style="top: 10%; left: -5%;"></div>
+    <div class="orb" style="bottom: 10%; right: -5%; animation-delay: 2s;"></div>
+
+    <header>
+        <div class="logo">DUNI<span>GO</span></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="#">Solutions</a>
+            <a href="about.html" style="color: var(--primary);">About Us</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <section class="about-hero reveal">
+        <p style="letter-spacing: 5px; color: var(--primary);">THE STORY OF</p>
+        <h1>Engineering <span>Excellence.</span></h1>
+    </section>
+
+    <section class="founder-container">
+        <div class="founder-image-box reveal">
+            <span>👨‍💻</span>
+        </div>
+        <div class="founder-text reveal">
+            <h4>MEET THE FOUNDER</h4>
+            <h2>Aayush</h2>
+            <p style="color: white; font-weight: 600;">IIT Delhi | B.Tech Computer Science & Engineering</p>
+            <p>
+                From the halls of IIT Delhi to the cutting edge of global software engineering, my mission has always been simple: 
+                to build technology that solves real-world problems at scale. 
+            </p>
+            <p>
+                With a deep background in CSE, I founded Dunigo to bridge the gap between complex engineering and elegant, 
+                high-velocity business solutions. We don't just write code; we build the future.
+            </p>
+        </div>
+    </section>
+
+    <section class="vision-section reveal">
+        <div class="year-tag">2026</div>
+        <h2 style="font-size: 3rem;">Established for the <span class="gradient-text">New Era.</span></h2>
+        <p style="color: #94a3b8; max-width: 700px; margin: 20px auto;">
+            Dunigo was established in 2026 as a premier software development powerhouse. We specialize in turning disruptive ideas into market-ready digital products.
+        </p>
+
+        <div class="vision-grid">
+            <div class="vision-card reveal">
+                <h3>Our Mission</h3>
+                <p>To empower startups with the same engineering caliber found in Silicon Valley giants.</p>
+            </div>
+            <div class="vision-card reveal" style="transition-delay: 0.2s;">
+                <h3>Our Vision</h3>
+                <p>To become the world's most trusted partner for high-velocity software engineering.</p>
+            </div>
+            <div class="vision-card reveal" style="transition-delay: 0.4s;">
+                <h3>Our Ethics</h3>
+                <p>Clean code, transparent architecture, and an obsession with user success.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="timeline reveal">
+        <h2 style="margin-bottom: 20px;">The Journey</h2>
+        <div style="width: 2px; height: 100px; background: linear-gradient(var(--primary), transparent); margin: 0 auto;"></div>
+        <p style="margin-top: 20px; color: var(--primary); font-weight: 800;">BEYOND THE HORIZON</p>
+    </section>
+
+    <footer>
+        <p>DUNIGO &copy; 2026 | FOUNDED BY AAYUSH (IITD)</p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

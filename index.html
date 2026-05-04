@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunigo | Accelerate Your Digital Success</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --accent: #ff007a;
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); overflow-x: hidden; }
+
+        /* --- BACKGROUND MESH GLO --- */
+        .mesh-gradient {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(58, 123, 213, 0.08) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        header {
+            position: fixed; top: 0; width: 100%; padding: 25px 8%;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px);
+            z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { font-size: 2rem; font-weight: 900; letter-spacing: -1.5px; }
+        .logo span { color: var(--primary); }
+
+        nav ul { display: flex; list-style: none; gap: 35px; align-items: center; }
+        nav a { text-decoration: none; color: var(--text-dim); font-weight: 500; transition: 0.4s; }
+        nav a:hover { color: var(--primary); transform: translateY(-2px); }
+
+        .btn-glow {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 12px 28px; border-radius: 50px; color: white !important;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); font-weight: 700;
+        }
+
+        /* --- ANIMATION KEYFRAMES --- */
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-100px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.19, 1, 0.22, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 0 10%;
+        }
+
+        .hero h1 { font-size: 6rem; font-weight: 900; line-height: 0.9; margin-bottom: 20px; }
+        .hero p { font-size: 1.4rem; color: var(--text-dim); max-width: 700px; margin-bottom: 40px; }
+
+        /* --- SUCCESS SECTION (The "Why") --- */
+        .success-banner {
+            background: linear-gradient(90deg, #111, #1a1a1a);
+            padding: 80px 10%; border-radius: 0 100px 0 100px;
+            margin: 50px 0; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; text-align: center; }
+        .stat-item h2 { font-size: 3.5rem; color: var(--primary); margin-bottom: 5px; }
+
+        /* --- FEATURES SECTION --- */
+        .features { padding: 100px 10%; }
+        .feature-row { 
+            display: flex; align-items: center; gap: 50px; margin-bottom: 100px; 
+            flex-wrap: wrap; 
+        }
+        .feature-row:nth-child(even) { flex-direction: row-reverse; }
+
+        .feature-content { flex: 1; min-width: 300px; }
+        .feature-content h3 { font-size: 2.8rem; margin-bottom: 20px; color: var(--primary); }
+        .feature-visual { 
+            flex: 1; min-width: 300px; height: 350px; 
+            background: linear-gradient(135deg, rgba(58, 123, 213, 0.2), rgba(0, 210, 255, 0.1));
+            border-radius: 30px; border: 2px dashed rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 5rem;
+        }
+
+        /* --- FORM --- */
+        .form-wrapper {
+            background: #111; padding: 60px; border-radius: 40px; 
+            border: 1px solid var(--primary); max-width: 1000px; margin: 100px auto;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input, textarea {
+            width: 100%; padding: 20px; background: #050505; border: 1px solid #333;
+            border-radius: 15px; color: white; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+
+        .submit-btn {
+            background: var(--primary); width: 100%; padding: 22px; border: none;
+            border-radius: 15px; font-size: 1.2rem; font-weight: 800; cursor: pointer;
+            margin-top: 20px; transition: 0.4s;
+        }
+        .submit-btn:hover { background: white; color: black; transform: translateY(-5px); }
+
+        footer { text-align: center; padding: 50px; color: var(--text-dim); letter-spacing: 2px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-gradient"></div>
+
+    <header>
+        <div class="logo">DUNI<span>GO</span></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="carrer.html">Careers</a></li>
+                <li><a href="#success">Our Mission</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="javascript:void(0)" onclick="handleAuthRedirect()">Login/Signup</a></li>
+                <li><a href="#contact" class="btn-glow">Work With Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero reveal">
+        <h1>Zero to <span style="color: var(--primary);">Success</span><br>at Light Speed.</h1>
+        <p>We deliver high-end software solutions in record time, so you can focus on scaling your empire.</p>
+        <div style="font-size: 3rem; animation: pulse 2s infinite;">⚡</div>
+    </section>
+
+    <section id="success" class="success-banner reveal">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2>40%</h2>
+                <p>Faster Delivery than Market</p>
+            </div>
+            <div class="stat-item">
+                <h2>99%</h2>
+                <p>Client Success Rate</p>
+            </div>
+            <div class="stat-item">
+                <h2>24/7</h2>
+                <p>Engineering Support</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="feature-row reveal">
+            <div class="feature-content">
+                <h3>Rapid Development</h3>
+                <p>Time is money. Our "Agile-X" methodology allows us to deliver full-scale software solutions in half the traditional time without sacrificing a single line of quality.</p>
+            </div>
+            <div class="feature-visual">⏱️</div>
+        </div>
+
+        <div class="feature-row reveal">
+            <div class="feature-content">
+                <h3>Startups to Titans</h3>
+                <p>Whether you're a 2-person startup or a global enterprise, we build the digital foundation that lets you become a market leader. Let's win together.</p>
+            </div>
+            <div class="feature-visual">🏆</div>
+        </div>
+        
+        <div class="feature-row reveal">
+            <div class="feature-content">
+                <h3>Cost-Effective Scale</h3>
+                <p>Premium engineering doesn't have to break the bank. We optimize our dev-cycles to provide high-end code at a competitive rate.</p>
+            </div>
+            <div class="feature-visual">💰</div>
+        </div>
+    </section>
+
+    <section id="contact" class="reveal">
+        <div class="form-wrapper">
+            <h2 style="font-size: 3rem; margin-bottom: 30px; text-align: center;">Let's Become <span style="color: var(--primary);">Success</span> Together</h2>
+            <form>
+                <div class="form-grid">
+                    <input type="text" placeholder="Your Name">
+                    <input type="email" placeholder="Business Email">
+                </div>
+                <input type="text" placeholder="What are we building? (Web, App, AI)">
+                <textarea rows="5" placeholder="Your Vision..."></textarea>
+                <button type="submit" class="submit-btn">INITIATE PROJECT</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>DUNIGO &copy; 2026 | BUILT FOR THE NEXT GENERATION</p>
+    </footer>
+
+    <script>
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html><script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // Aapka Firebase Config (Wahi jo login.html mein hai)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+        authDomain: "dunigo-977a6.firebaseapp.com",
+        projectId: "dunigo-977a6",
+        appId: "1:728896139433:web:6b2026924b159fce7179b8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Global function taaki HTML se call ho sake
+    window.handleAuthRedirect = () => {
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                // Agar login hai aur email verified hai
+                window.location.href = "dashboard.html";
+            } else {
+                // Agar login nahi hai
+                window.location.href = "login.html";
+            }
+        });
+    };
+</script>
