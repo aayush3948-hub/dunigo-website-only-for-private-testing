@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply | Dunigo Logistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #0ea5e9;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            background-image: radial-gradient(circle at 50% 0%, #0c4a6e 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .apply-container {
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .job-label-box {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .job-label-box h1 { font-size: 2.5rem; font-weight: 800; }
+        .job-label-box p { color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
+
+        /* Eligibility Section */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: #f8fafc; }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .check-item:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--primary); }
+
+        .check-item input { width: 20px; height: 20px; accent-color: var(--primary); }
+
+        /* Main Form - Hidden initially */
+        #mainApplicationForm {
+            display: none; 
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        #mainApplicationForm.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) { .grid-inputs { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; margin-left: 5px; }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); background: rgba(2, 6, 23, 0.8); }
+
+        .submit-btn {
+            background: #fff;
+            color: #020617;
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.4s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 15px 30px rgba(14, 165, 233, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .submit-btn:disabled {
+            background: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: 0.3s;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+}
+
+.back-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(14, 165, 233, 0.05);
+    transform: translateX(-5px);
+}
+    </style>
+</head>
+<body>
+    <body>
+    <div class="apply-container">
+        <!-- Naya Back Button -->
+        <div style="margin-bottom: 20px;">
+            <a href="javascript:void(0)" id="backToJob" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Job Description
+            </a>
+        </div>
+
+        <div class="job-label-box">
+            <p>Application Form</p>
+            <h1 id="displayRole">Loading Job...</h1>
+        </div>
+
+    
+
+        <!-- Step 1: Eligibility Checklist -->
+        <div class="glass-card">
+            <div class="section-title">Step 1: Eligibility Check</div>
+            <label class="check-item">
+                <input type="checkbox" class="eligibility-check">
+                <span>I have carefully read the job description and requirements.</span>
+            </label>
+            <label class="check-item">
+                <input type="checkbox" class="eligibility-check">
+                <span>I am authorized to work in India.</span>
+            </label>
+            <label class="check-item">
+                <input type="checkbox" class="eligibility-check">
+                <span>I confirm that all information provided below will be 100% accurate.</span>
+            </label>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px; text-align: center;">
+                Complete the checklist to unlock the application form.
+            </p>
+        </div>
+
+        <!-- Step 2: Main Form -->
+        <div id="mainApplicationForm" class="glass-card">
+            <div class="section-title">Step 2: Candidate Details</div>
+            
+            <div class="grid-inputs">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="appName" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="appEmail" placeholder="john@example.com">
+                </div>
+            </div>
+
+            <div class="grid-inputs">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="appPhone" placeholder="+91 00000 00000">
+                </div>
+                <div class="form-group">
+                    <label>Experience (in Years)</label>
+                    <input type="number" id="appExp" placeholder="e.g. 2">
+                </div>
+            </div>
+
+            <div class="grid-inputs">
+                <div class="form-group">
+                    <label>Preferred Location</label>
+                    <input type="text" id="appLocation" placeholder="e.g. Delhi, Remote">
+                </div>
+                <div class="form-group">
+                    <label>Notice Period (Days)</label>
+                    <input type="number" id="appNotice" placeholder="e.g. 30">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Resume (PDF Only)</label>
+                <input type="file" id="appResume" accept=".pdf">
+            </div>
+
+            <label class="check-item" style="background: transparent; padding: 0; border: none; margin-top: 20px;">
+                <input type="checkbox" id="finalConsent" required>
+                <span style="font-size: 0.85rem; color: #cbd5e1;">I understand that providing false information will lead to immediate disqualification.</span>
+            </label>
+
+            <button class="submit-btn" id="submitBtn" onclick="submitApplication()">Submit Application</button>
+        </div>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 1. Auth import karein
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+        authDomain: "dunigo-977a6.firebaseapp.com",
+        projectId: "dunigo-977a6",
+        appId: "1:728896139433:web:6b2026924b159fce7179b8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app); // Auth initialize
+
+    let currentUser = null;
+
+    // 2. AUTH GUARD: Check if user is logged in
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Agar login nahi hai toh wapas bhej do
+            alert("Session expired or not logged in. Please login first.");
+            window.location.href = "login.html";
+        } else {
+            currentUser = user;
+            // Pre-fill email if you want
+            document.getElementById('appEmail').value = user.email;
+        }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get('id');
+    const jobRole = params.get('role');
+
+    // Back Button Logic
+    if (jobId) {
+        document.getElementById('backToJob').onclick = () => {
+            window.location.href = `job-details.html?id=${jobId}`;
+        };
+    } else {
+        document.getElementById('backToJob').onclick = () => {
+            window.location.href = "careers.html";
+        };
+    }
+
+    document.getElementById('displayRole').innerText = jobRole || "Apply for Role";
+
+    // --- Multi-Step Logic ---
+    const checks = document.querySelectorAll('.eligibility-check');
+    const form = document.getElementById('mainApplicationForm');
+
+    checks.forEach(c => {
+        c.addEventListener('change', () => {
+            const allChecked = Array.from(checks).every(check => check.checked);
+            if(allChecked) {
+                form.style.display = "block";
+                setTimeout(() => form.classList.add('visible'), 10);
+            } else {
+                form.classList.remove('visible');
+                setTimeout(() => form.style.display = "none", 600);
+            }
+        });
+    });
+
+    // --- Submit Function ---
+    window.submitApplication = async () => {
+        if(!currentUser) return alert("User not authenticated.");
+
+        const btn = document.getElementById('submitBtn');
+        const consent = document.getElementById('finalConsent').checked;
+        const resumeFile = document.getElementById('appResume').files[0];
+
+        if(!consent) return alert("Please agree to the final declaration.");
+        if(!resumeFile) return alert("Please upload your resume.");
+
+        const name = document.getElementById('appName').value;
+        const email = document.getElementById('appEmail').value;
+        
+        if(!name || !email) return alert("Please fill all basic details.");
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        const reader = new FileReader();
+        reader.readAsDataURL(resumeFile);
+        reader.onload = async () => {
+            try {
+                await addDoc(collection(db, "applications"), {
+                    jobId: jobId,
+                    jobRole: jobRole,
+                    applicantId: currentUser.uid, // Tracking user
+                    applicantName: name,
+                    applicantEmail: email,
+                    phone: document.getElementById('appPhone').value,
+                    experience: document.getElementById('appExp').value,
+                    preferredLocation: document.getElementById('appLocation').value,
+                    noticePeriod: document.getElementById('appNotice').value,
+                    resumeData: reader.result,
+                    status: "Pending",
+                    appliedAt: serverTimestamp()
+                });
+
+                window.location.href = "success.html";
+            } catch (e) {
+                alert("Error: " + e.message);
+                btn.disabled = false;
+                btn.innerText = "Submit Application";
+            }
+        };
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunigo Careers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #0ea5e9;
+            --primary-glow: rgba(14, 165, 233, 0.3);
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            background-image: 
+                radial-gradient(circle at 0% 0%, #0c4a6e 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, #020617 0%, transparent 40%);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 5%;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .back-link:hover { transform: translateX(-5px); }
+
+        /* Header Section */
+        .job-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 50px;
+            border-radius: 40px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-header::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 200px; height: 200px;
+            background: var(--primary);
+            filter: blur(120px);
+            opacity: 0.1;
+        }
+
+        .badge {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 15px; }
+        
+        .meta-info {
+            display: flex;
+            gap: 20px;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Content Section */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 850px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .description-text { color: #cbd5e1; font-size: 1.1rem; margin-bottom: 40px; }
+
+        ul.requirements-list {
+            list-style: none;
+        }
+
+        ul.requirements-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #cbd5e1;
+        }
+
+        ul.requirements-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* Sidebar Card */
+        .sidebar-card {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            padding: 40px;
+            border-radius: 32px;
+            height: fit-content;
+            position: sticky;
+            top: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.2);
+            animation: slideInRight 1s ease-out;
+        }
+
+        .sidebar-card h3 { font-size: 1.8rem; margin-bottom: 15px; }
+        .sidebar-card p { margin-bottom: 25px; opacity: 0.9; }
+
+        .apply-now-btn {
+            background: white;
+            color: var(--bg);
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .apply-now-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Loading Skeleton */
+        .loading-shimmer {
+            width: 100%;
+            height: 400px;
+            background: #0f172a;
+            border-radius: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <a href="carrer.html" class="back-link">← Back to Careers</a>
+
+        <div id="jobDetailsContent">
+            <!-- Data will be loaded here -->
+            <div class="loading-shimmer"></div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 1. Auth import karein
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+        authDomain: "dunigo-977a6.firebaseapp.com",
+        projectId: "dunigo-977a6",
+        storageBucket: "dunigo-977a6.firebasestorage.app",
+        messagingSenderId: "728896139433",
+        appId: "1:728896139433:web:6b2026924b159fce7179b8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app); // Auth initialize karein
+
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get('id');
+
+    // Helper function same rahega
+    const createList = (dataField) => {
+        if (!dataField) return ""; 
+        return dataField.split('\n').filter(item => item.trim() !== "").map(item => `<li>${item.trim()}</li>`).join('');
+    };
+
+    // 2. Start Application Logic with Login Check
+    window.startApplyProcess = (id, role) => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User login hai -> Apply page par bhejo
+                window.location.href = `apply.html?id=${id}&role=${encodeURIComponent(role)}`;
+            } else {
+                // User login nahi hai -> Pehle alert dikhao phir login page par bhejo
+                alert("Please login first to apply for this position.");
+                window.location.href = "login.html";
+            }
+        });
+    };
+
+    async function loadJobDetails() {
+        if (!jobId) return;
+
+        const docRef = doc(db, "jobs", jobId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            
+            document.getElementById('jobDetailsContent').innerHTML = `
+                <header class="job-header">
+                    <span class="badge">Dunigo</span>
+                    <h1>${data.role}</h1>
+                    <div class="meta-info">
+                        <span>📍 ${data.location || 'India'}</span>
+                        <span>💼 ${data.type || 'Full-time'}</span>
+                    </div>
+                </header>
+
+                <div class="content-grid">
+                    <div class="main-content">
+                        <div class="section-block">
+                            <div class="section-title">Overview</div>
+                            <p class="description-text">${data.description || 'No description provided.'}</p>
+                        </div>
+                        ${data.responsibilities ? `
+                        <div class="section-block">
+                            <div class="section-title">Key Responsibilities</div>
+                            <ul class="requirements-list">${createList(data.responsibilities)}</ul>
+                        </div>` : ''}
+                        <div class="section-block">
+                            <div class="section-title">Requirements</div>
+                            <ul class="requirements-list">${createList(data.requirements)}</ul>
+                        </div>
+                        ${data.niceToHave ? `
+                        <div class="section-block">
+                            <div class="section-title">Nice to Have (Bonus)</div>
+                            <ul class="requirements-list">${createList(data.niceToHave)}</ul>
+                        </div>` : ''}
+                        ${data.benefits ? `
+                        <div class="section-block">
+                            <div class="section-title">What we offer (Perks)</div>
+                            <div class="benefits-grid">
+                                <ul class="requirements-list">${createList(data.benefits)}</ul>
+                            </div>
+                        </div>` : ''}
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>Apply Now</h3>
+                        <p>Join the future of tech at Dunigo.</p>
+                        <!-- 3. Update onclick to use our new function -->
+                        <button class="apply-now-btn" onclick="startApplyProcess('${jobId}', '${data.role}')">
+                            Start Application
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    loadJobDetails();
+</script>
+
+<style>
+    /* Naya Section Block Styling */
+    .section-block {
+        margin-bottom: 45px;
+        animation: fadeInUp 0.5s ease forwards;
+    }
+    .section-title {
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        color: var(--primary);
+    }
+    .benefits-grid {
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px dashed var(--border);
+    }
+</style>
+</body>
+</html>
+</head>
+<body>
+    
+</body>
+</html>
