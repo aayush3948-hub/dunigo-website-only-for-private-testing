@@ -161,9 +161,32 @@
     outline: none;
 }
 .modal-input:focus { border-color: var(--primary); }
+.back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .back-link:hover { transform: translateX(-5px); }
+        container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 5%;
+            animation: fadeInUp 0.8s ease-out;
+        }
     </style>
 </head>
 <body>
+    <div class="container" id="mainContainer">
+        <a href="index.html" class="back-link">← Back to Home</a>
+
+        <div id="jobDetailsContent">
+            <!-- Data will be loaded here -->
+            <div class="loading-shimmer"></div>
+        </div>
+    </div>
 
     <section class="hero">
         <h1>Career at <span>Dunigo</span></h1>
@@ -205,24 +228,27 @@
     });
 
     // Load Jobs from Firestore
-    onSnapshot(collection(db, "jobs"), (snapshot) => {
-        const grid = document.getElementById("jobsGrid");
-        grid.innerHTML = "";
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            const card = document.createElement("div");
-            card.className = "job-card";
-            card.innerHTML = `
-                <div>
-                    <div class="company-name">${data.company || "Dunigo"}</div>
-                    <h2 class="role-title">${data.role}</h2>
-                    <div class="location-tag">${data.location}</div>
-                </div>
-                <button class="apply-btn" onclick="openApplyModal('${doc.id}', '${data.role}')">Apply for this Role</button>
-            `;
-            grid.appendChild(card);
-        });
+onSnapshot(collection(db, "jobs"), (snapshot) => {
+    const grid = document.getElementById("jobsGrid");
+    grid.innerHTML = "";
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "job-card";
+        card.innerHTML = `
+            <div>
+                <div class="company-name">${data.company || "Dunigo"}</div>
+                <h2 class="role-title">${data.role}</h2>
+                <div class="location-tag">${data.location}</div>
+            </div>
+            <!-- Ab ye button modal nahi kholega, balki details page pe le jayega -->
+            <button class="apply-btn" onclick="window.location.href='job-details.html?id=${doc.id}'">
+                View Details & Apply
+            </button>
+        `;
+        grid.appendChild(card);
     });
+});
 
     // Open Modal Logic
     window.openApplyModal = (id, role) => {
