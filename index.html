@@ -211,6 +211,433 @@
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
+    <!-- Chatbot Floating Widget -->
+<style>
+    /* --- CHATBOT WIDGET STYLES --- */
+    .chat-launcher {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        z-index: 9999;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+    }
+    .chat-launcher.visible {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+    }
+    .chat-launcher:hover {
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: 0 0 30px rgba(0, 210, 255, 0.7);
+    }
+
+    .chat-box {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 380px;
+        height: 520px;
+        background: #111111;
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0, 210, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9999;
+        transform: translateY(50px) scale(0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .chat-box.active {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Header */
+    .chat-header {
+        background: linear-gradient(90deg, #161616, #222);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .chat-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .chat-status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #00ff66;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #00ff66;
+    }
+    .chat-close-btn {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+    .chat-close-btn:hover {
+        color: var(--accent);
+        background: rgba(255, 0, 122, 0.1);
+    }
+
+    /* Messages Body */
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        scroll-behavior: smooth;
+    }
+    .msg {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+    .msg.bot {
+        background: #1a1a1a;
+        color: var(--text-main);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .msg.user {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+
+    /* Dynamic Suggestion Buttons */
+    .chat-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 5px;
+    }
+    .option-btn {
+        background: rgba(0, 210, 255, 0.1);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .option-btn:hover {
+        background: var(--primary);
+        color: black;
+    }
+
+    /* Typing Indicator Animation */
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 4px 8px;
+        align-items: center;
+    }
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background: var(--text-dim);
+        border-radius: 50%;
+        animation: blink 1.4s infinite both;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: .2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes blink {
+        0% { opacity: .2; }
+        20% { opacity: 1; }
+        100% { opacity: .2; }
+    }
+
+    /* Input Footer */
+    .chat-footer {
+        padding: 15px;
+        background: #0d0d0d;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        gap: 10px;
+    }
+    .chat-input {
+        flex: 1;
+        padding: 12px 15px;
+        background: #161616;
+        border: 1px solid #262626;
+        border-radius: 12px;
+        color: white;
+        font-size: 0.95rem;
+        outline: none;
+        transition: 0.3s;
+    }
+    .chat-input:focus {
+        border-color: var(--primary);
+    }
+    .chat-send-btn {
+        background: var(--primary);
+        border: none;
+        color: black;
+        font-weight: bold;
+        padding: 0 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .chat-send-btn:hover {
+        background: white;
+    }
+
+    @media(max-width: 450px) {
+        .chat-box { width: calc(100% - 40px); right: 20px; left: 20px; bottom: 20px; height: 480px; }
+        .chat-launcher { bottom: 20px; right: 20px; }
+    }
+</style>
+
+<!-- Launcher Button -->
+<div class="chat-launcher" id="chatLauncher" onclick="toggleChat(true)">
+    💬
+</div>
+
+<!-- Chat Window -->
+<div class="chat-box" id="chatBox">
+    <div class="chat-header">
+        <div class="chat-title">
+            <div class="chat-status-dot"></div>
+            <span>Dunigo Agent AI</span>
+        </div>
+        <button class="chat-close-btn" onclick="toggleChat(false)">&times;</button>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+        <div class="msg bot">
+            Hey there! 👋 Welcome to Dunigo. I am your automated accelerator agent. How can we help you scale today?
+            <div class="chat-options">
+    <button class="option-btn" onclick="handleQuickOption('Our Services')">🚀 Our Services</button>
+    <button class="option-btn" onclick="handleQuickOption('About Founder')">👨‍💻 About Us</button>
+    <button class="option-btn" onclick="handleQuickOption('How to Apply for Job')">💼 Apply for Job</button>
+    <button class="option-btn" onclick="handleQuickOption('Track Application')">🔍 Track Status</button>
+    <button class="option-btn" onclick="handleQuickOption('Contact Us')">📞 Connect</button>
+</div>
+        </div>
+    </div>
+    
+    <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about services, hiring..." onkeypress="handleKeyPress(event)">
+        <button class="chat-send-btn" onclick="sendUserMessage()">→</button>
+    </div>
+</div>
+
+<!-- REAL AI DYNAMIC ENGINE SCRIPT -->
+    <script>
+        // 🛠️ REAL AI GEMINI CONFIGURATION
+    const GEMINI_API_KEY = "AIzaSyBWT401LGoqCLNAUa8aksTUdPeclYq_4_0"; 
+
+    const chatBox = document.getElementById('chatBox');
+    const chatLauncher = document.getElementById('chatLauncher');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+
+    // 🧠 SYSTEM INSTRUCTIONS: Services, Founder, Connect, carrer.html, aur Tracking par focused.
+const SYSTEM_INSTRUCTION = `
+You are Dunigo Agent AI, the active native intelligent brain of Dunigo (2026).
+You speak dynamically and clearly in mixed Hindi/English (Hinglish) or professional English depending on the user's input vibe. Never sound like a hardcoded robot.
+
+YOUR RE-CONFIGURED KNOWLEDGE ECOSYSTEM:
+1. SERVICES EXPERTISE: Dunigo manufactures premium High-End Web Applications, Responsive/Scalable Mobile Systems (iOS/Android), and specialized custom AI integrations. We optimize architectural delivery timelines by 40% using our unique 'Agile-X' production framework.
+2. ABOUT FOUNDER (about.html): Aayush is the tech-visionary Founder, Chief Architect, and Team Director behind Dunigo. He leads our elite engineering team to craft modern layouts. If anyone asks about the founder or company brains, present Aayush proudly.
+3. CAREERS & APPLYING (carrer.html): We have built a fully automated portal at "carrer.html". If users ask how to get a job, open openings, or apply, strictly advise them to navigate to the Careers page (carrer.html) to view active slots and upload profiles.
+4. TRACK APPLICATION STATUS: If applicants ask how to check progress or tracking, instruct them to hit the 'Login/Signup' button in the header nav menu to launch their live Firebase Dashboard Panel.
+5. CONNECT / WORK WITH US / COLLABORATE: If clients want to work with Dunigo, pitch, or sync, tell them to scroll down directly to the Intake Form on this page or drop details to grow@dunigo.com.
+
+RULE: Always respond natively using your core LLM intelligence for general questions, calculations, or coding help, keeping the absolute focus on Dunigo's premium brand aura.
+`;
+
+    // Auto launcher handling on load
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            chatBox.classList.add('active');
+            chatInput.focus();
+        }, 800);
+    });
+
+    function toggleChat(open) {
+        if (open) {
+            chatBox.classList.add('active');
+            chatLauncher.classList.remove('visible');
+            setTimeout(() => chatInput.focus(), 400);
+        } else {
+            chatBox.classList.remove('active');
+            chatLauncher.classList.add('visible');
+        }
+    }
+
+    async function sendUserMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user');
+        chatInput.value = '';
+        
+        showTypingIndicator();
+
+        // FIX: Ab yeh check karega ki key empty ya default template string to nahi hai
+        if (GEMINI_API_KEY === "" || GEMINI_API_KEY.includes("YOUR_GEMINI")) {
+            setTimeout(() => {
+                removeTypingIndicator();
+                executeSmartFallback(text);
+            }, 1000);
+            return;
+        }
+
+        try {
+            // Calling Google Gemini API with the System Instruction payload
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `${SYSTEM_INSTRUCTION}\n\nUser Input: ${text}` }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            removeTypingIndicator();
+
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                let aiOutput = data.candidates[0].content.parts[0].text;
+                appendMessage(aiOutput, 'bot');
+            } else {
+                console.error("API response structure unexpected:", data);
+                executeSmartFallback(text);
+            }
+
+        } catch (err) {
+            console.error("Gemini Live Engine Error:", err);
+            removeTypingIndicator();
+            executeSmartFallback(text);
+        }
+    }
+
+    function handleQuickOption(optionValue) {
+        chatInput.value = optionValue;
+        sendUserMessage();
+    }
+
+    // 🧠 BACKUP ENGINE: Updated precisely to support carrer.html, Services, and Tracking
+function executeSmartFallback(input) {
+    const low = input.toLowerCase();
+    
+    if (low.includes('service')) {
+        appendMessage("Dunigo creates high-end Web ecosystems, custom iOS/Android apps, and tailormade Neural AI modules at 40% faster speed using Agile-X.", 'bot');
+        return;
+    }
+    if (low.includes('aayush') || low.includes('about')) {
+        appendMessage("Aayush is the Founder and Chief Architect of Dunigo. He builds scalable engineering structures. Head over to About Ua  for details!", 'bot');
+        return;
+    }
+    if (low.includes('apply') || low.includes('job') || low.includes('career') || low.includes('hiring')) {
+        appendMessage("We have a dedicated career system! Head over to Career Page right now to browse active slots and drop your profile application.", 'bot', ['Go to Careers Page']);
+        return;
+    }
+    if (low.includes('track') || low.includes('status') || low.includes('interview')) {
+        appendMessage("To check your hiring status live, simply click the 'Login/Signup' button at the top navigation bar to initialize your candidate panel.", 'bot', ['Open Login Dashboard']);
+        return;
+    }
+    if (low.includes('connect') || low.includes('work') || low.includes('contact') || low.includes('collaborate')) {
+        appendMessage("Let's build something epic! 🚀 You can fill out the form at the bottom of this page or email your project blueprint directly to grow@dunigo.com.", 'bot', ['Scroll To Form']);
+        return;
+    }
+
+    appendMessage("I'm your Dunigo Agent. Ask me about our Services, About us, applying for jobs, or tracking application workflows!", 'bot');
+}
+
+    function appendMessage(text, sender, options = []) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('msg', sender);
+        msgDiv.innerText = text;
+
+        if (options && options.length > 0) {
+            const optContainer = document.createElement('div');
+            optContainer.classList.add('chat-options');
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.classList.add('option-btn');
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === 'Trigger Login Routing') window.handleAuthRedirect();
+                    if (opt === 'Scroll To Form') document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                    else handleQuickOption(opt);
+                };
+                optContainer.appendChild(btn);
+            });
+            msgDiv.appendChild(optContainer);
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        removeTypingIndicator();
+        const indicator = document.createElement('div');
+        indicator.classList.add('msg', 'bot');
+        indicator.id = 'botTypingIndicator';
+        indicator.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+        chatMessages.appendChild(indicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const el = document.getElementById('botTypingIndicator');
+        if (el) el.remove();
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') sendUserMessage();
+    }
+    </script>
+    
+
+
+
 </body>
 </html><script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -239,4 +666,6 @@
             }
         });
     };
+
+    
 </script>
