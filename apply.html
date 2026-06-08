@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apply | Dunigo Logistics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #020617;
@@ -67,20 +67,28 @@
         }
 
         .check-item:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--primary); }
-
         .check-item input { width: 20px; height: 20px; accent-color: var(--primary); }
 
-        /* Main Form - Hidden initially */
+        /* Main Form - Fixed max-height clipping issue for long/dynamic questions */
         #mainApplicationForm {
             display: none; 
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            max-height: 0;
+            overflow: hidden;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.7s cubic-bezier(0.16, 1, 0.3, 1), padding 0.5s ease;
         }
 
         #mainApplicationForm.visible {
             display: block;
             opacity: 1;
+            max-height: 4000px; /* Increased safe buffer capacity so questions don't cut off */
+            padding-top: 40px;
+            padding-bottom: 40px;
+            margin-bottom: 30px;
             transform: translateY(0);
         }
 
@@ -137,32 +145,31 @@
             transform: none;
             box-shadow: none;
         }
-        .back-link {
-    display: inline-flex;
-    align-items: center;
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: 0.3s;
-    padding: 8px 16px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-}
 
-.back-link:hover {
-    color: var(--primary);
-    border-color: var(--primary);
-    background: rgba(14, 165, 233, 0.05);
-    transform: translateX(-5px);
-}
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+            transform: translateX(-5px);
+        }
     </style>
 </head>
 <body>
-    <body>
     <div class="apply-container">
-        <!-- Naya Back Button -->
         <div style="margin-bottom: 20px;">
             <a href="javascript:void(0)" id="backToJob" class="back-link">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
@@ -177,9 +184,6 @@
             <h1 id="displayRole">Loading Job...</h1>
         </div>
 
-    
-
-        <!-- Step 1: Eligibility Checklist -->
         <div class="glass-card">
             <div class="section-title">Step 1: Eligibility Check</div>
             <label class="check-item">
@@ -199,7 +203,6 @@
             </p>
         </div>
 
-        <!-- Step 2: Main Form -->
         <div id="mainApplicationForm" class="glass-card">
             <div class="section-title">Step 2: Candidate Details</div>
             
@@ -241,6 +244,8 @@
                 <input type="file" id="appResume" accept=".pdf">
             </div>
 
+            <div id="dynamicQuestionsContainer" style="margin-top: 10px;"></div>
+
             <label class="check-item" style="background: transparent; padding: 0; border: none; margin-top: 20px;">
                 <input type="checkbox" id="finalConsent" required>
                 <span style="font-size: 0.85rem; color: #cbd5e1;">I understand that providing false information will lead to immediate disqualification.</span>
@@ -252,8 +257,7 @@
 
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    // 1. Auth import karein
+    import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -265,41 +269,75 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app); // Auth initialize
+    const auth = getAuth(app);
 
     let currentUser = null;
-
-    // 2. AUTH GUARD: Check if user is logged in
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            // Agar login nahi hai toh wapas bhej do
-            alert("Session expired or not logged in. Please login first.");
-            window.location.href = "login.html";
-        } else {
-            currentUser = user;
-            // Pre-fill email if you want
-            document.getElementById('appEmail').value = user.email;
-        }
-    });
 
     const params = new URLSearchParams(window.location.search);
     const jobId = params.get('id');
     const jobRole = params.get('role');
 
-    // Back Button Logic
+    // AUTH GUARD & Trigger Async Data Fetch
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            alert("Session expired or not logged in. Please login first.");
+            window.location.href = "login.html";
+        } else {
+            currentUser = user;
+            document.getElementById('appEmail').value = user.email;
+            
+            if(jobId) {
+                fetchCustomQuestions(jobId);
+            }
+        }
+    });
+
+    // Dynamic screening questions renderer function
+    async function fetchCustomQuestions(id) {
+        try {
+            const jobSnap = await getDoc(doc(db, "jobs", id));
+            if (jobSnap.exists()) {
+                const jobData = jobSnap.data();
+                const questionsContainer = document.getElementById("dynamicQuestionsContainer");
+                questionsContainer.innerHTML = ""; 
+
+                if (jobData.customQuestions && jobData.customQuestions.length > 0) {
+                    const header = document.createElement("div");
+                    header.className = "section-title";
+                    header.style.marginTop = "25px";
+                    header.innerText = "Step 3: Screening Questions";
+                    questionsContainer.appendChild(header);
+
+                    jobData.customQuestions.forEach((question) => {
+                        const inputGroup = document.createElement("div");
+                        inputGroup.className = "form-group";
+                        inputGroup.innerHTML = `
+                            <label style="color: #cbd5e1; font-weight: 600; margin-bottom: 8px; display:block;">${question}</label>
+                            <input type="text" class="custom-answer-field" data-question="${question}" required placeholder="Write your response here...">
+                        `;
+                        questionsContainer.appendChild(inputGroup);
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Error loading screening questions:", error);
+        }
+    }
+
+    // Back Button Redirection Controller
     if (jobId) {
         document.getElementById('backToJob').onclick = () => {
             window.location.href = `job-details.html?id=${jobId}`;
         };
     } else {
         document.getElementById('backToJob').onclick = () => {
-            window.location.href = "careers.html";
+            window.location.href = "carrer.html";
         };
     }
 
     document.getElementById('displayRole').innerText = jobRole || "Apply for Role";
 
-    // --- Multi-Step Logic ---
+    // Smooth Multi-Step Checklist Toggle Animation Logic
     const checks = document.querySelectorAll('.eligibility-check');
     const form = document.getElementById('mainApplicationForm');
 
@@ -308,15 +346,32 @@
             const allChecked = Array.from(checks).every(check => check.checked);
             if(allChecked) {
                 form.style.display = "block";
-                setTimeout(() => form.classList.add('visible'), 10);
+                setTimeout(() => {
+                    form.classList.add('visible');
+                    // Animation complete hone ke baad max-height auto ya none kar dena safe layout ke liye
+                    setTimeout(() => {
+                        if(form.classList.contains('visible')) {
+                            form.style.maxHeight = "none";
+                            form.style.overflow = "visible";
+                        }
+                    }, 700);
+                }, 20);
             } else {
-                form.classList.remove('visible');
-                setTimeout(() => form.style.display = "none", 600);
+                form.style.maxHeight = "4000px"; // Reset back to capture slide up correctly
+                form.style.overflow = "hidden";
+                setTimeout(() => {
+                    form.classList.remove('visible');
+                    setTimeout(() => {
+                        if(!form.classList.contains('visible')) {
+                            form.style.display = "none";
+                        }
+                    }, 600);
+                }, 10);
             }
         });
     });
 
-    // --- Submit Function ---
+    // Application data saving payload function
     window.submitApplication = async () => {
         if(!currentUser) return alert("User not authenticated.");
 
@@ -332,6 +387,23 @@
         
         if(!name || !email) return alert("Please fill all basic details.");
 
+        // Dynamic Questions Answers evaluation logic
+        const answerFields = document.querySelectorAll(".custom-answer-field");
+        const screeningAnswers = [];
+        let validationPass = true;
+
+        answerFields.forEach(field => {
+            if(field.value.trim() === "") {
+                validationPass = false;
+            }
+            screeningAnswers.push({
+                question: field.getAttribute("data-question"),
+                answer: field.value.trim()
+            });
+        });
+
+        if(!validationPass) return alert("Please answer all job-specific screening questions.");
+
         btn.disabled = true;
         btn.innerText = "Processing...";
 
@@ -342,7 +414,7 @@
                 await addDoc(collection(db, "applications"), {
                     jobId: jobId,
                     jobRole: jobRole,
-                    applicantId: currentUser.uid, // Tracking user
+                    applicantId: currentUser.uid, 
                     applicantName: name,
                     applicantEmail: email,
                     phone: document.getElementById('appPhone').value,
@@ -350,6 +422,7 @@
                     preferredLocation: document.getElementById('appLocation').value,
                     noticePeriod: document.getElementById('appNotice').value,
                     resumeData: reader.result,
+                    screeningResponses: screeningAnswers, 
                     status: "Pending",
                     appliedAt: serverTimestamp()
                 });
