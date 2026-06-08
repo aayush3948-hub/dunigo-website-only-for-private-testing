@@ -18,28 +18,19 @@
 
         /* Main Content */
         .main-content { flex: 1; padding: 40px; display: none; }
-        .tab-content { display: none; animation: fadeIn 0.5s ease; }
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Tables & Forms */
+        
+        /* Tables */
         table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid var(--border); }
-        th, td { padding: 18px; text-align: left; border-bottom: 1px solid var(--border); }
+        th, td { padding: 18px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { background: rgba(14, 165, 233, 0.1); color: var(--primary); font-size: 0.8rem; text-transform: uppercase; }
 
-        .job-form { max-width: 700px; background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #94a3b8; }
-        input, textarea, select { width: 100%; padding: 12px; background: #020617; border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
-        input:focus, textarea:focus { border-color: var(--primary); }
-        
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: 800; width: 100%; margin-top: 10px; }
+        .action-group { display: inline-flex; gap: 8px; align-items: center; }
+        .view-btn { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .view-btn:hover { opacity: 0.9; }
+        .reject-btn { background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .reject-btn:hover { background: #dc2626; }
 
-        /* Previous Buttons & Tags */
-        .view-btn { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-        .reject-btn { background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; margin-left: 5px; }
-        .status-tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: 700; }
+        .status-tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: 700; display: inline-block; }
         .pending { background: rgba(234, 179, 8, 0.1); color: #eab308; }
         .scheduled { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
         .rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
@@ -51,150 +42,34 @@
         <h2>Checking Admin Credentials...</h2>
     </div>
 
-    <!-- Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
         <h2>Dunigo Admin</h2>
-        <button class="nav-btn active" onclick="switchTab('manageApp')">Manage Applications</button>
-        <button class="nav-btn" onclick="switchTab('postJob')">Manage Job Posting</button>
+        <button class="nav-btn active">Manage Applications</button>
+        <button class="nav-btn" onclick="window.location.href='job.html'">Manage Job Posting</button>
         <button class="nav-btn" onclick="logout()" style="margin-top: 50px; color: #ef4444;">Logout</button>
     </div>
 
-    <!-- Main Content Area -->
     <div class="main-content" id="mainContent">
-        
-        <!-- Tab 1: Manage Applications -->
-        <div id="manageApp" class="tab-content active">
-            <h1 style="margin-bottom: 20px;">Candidate Applications</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Applicant</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="appTableBody"></tbody>
-            </table>
-        </div>
-
-        <!-- Tab 2: Job Posting Form -->
-<!-- Tab 2: Job Management -->
-<div id="postJob" class="tab-content">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h1>Manage Jobs</h1>
-
-        <button class="submit-btn"
-            style="width:auto; padding:12px 20px;"
-            onclick="openCreateForm()">
-            + Create New Job
-        </button>
+        <h1 style="margin-bottom: 20px;">Candidate Applications</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Applicant</th>
+                    <th>Role</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                    <th style="width: 280px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="appTableBody"></tbody>
+        </table>
     </div>
-
-    <!-- JOB LIST -->
-    <div id="jobsContainer"
-        style="display:grid; gap:15px;">
-    </div>
-
-    <!-- CREATE / EDIT FORM -->
-<div class="job-form" id="jobFormContainer" style="display:none; margin-top:30px;">
-    <h2 id="formTitle">Create Job</h2>
-    <input type="hidden" id="editingJobId">
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div class="input-group">
-            <label>Job Role</label>
-            <input type="text" id="jobRole" placeholder="e.g. Operations Manager">
-        </div>
-        <div class="input-group">
-            <label>Location</label>
-            <input type="text" id="jobLoc" placeholder="e.g. Delhi, India">
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label>Job Description (Short Summary)</label>
-        <textarea id="jobDesc" rows="2"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>Key Responsibilities (One per line)</label>
-        <textarea id="jobResp" rows="3" placeholder="Manage daily shipments&#10;Coordinate with drivers"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>Minimum Requirements (One per line)</label>
-        <textarea id="jobReq" rows="3" placeholder="3+ years experience&#10;Bachelor's degree"></textarea>
-    </div>
-
-    <!-- NEW FIELDS -->
-    <div class="input-group">
-        <label>Nice to Have / Preferred Skills (One per line)</label>
-        <textarea id="jobNice" rows="2" placeholder="Experience in E-commerce&#10;Multi-language proficiency"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>Company Benefits & Perks (One per line)</label>
-        <textarea id="jobBenefits" rows="2" placeholder="Health Insurance&#10;Annual Performance Bonus"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>Job Type & Salary</label>
-        <div style="display:flex; gap:10px;">
-            <select id="jobType">
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Remote">Remote</option>
-                <option value="Contract">Contract</option>
-            </select>
-            <input type="text" id="jobSalary" placeholder="e.g. ₹40,000 - ₹60,000">
-        </div>
-    </div>
-
-    <button class="submit-btn" id="saveJobBtn" onclick="saveJob()">Save Job Posting</button>
-</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {
-    getFirestore,
-    collection,
-    onSnapshot,
-    doc,
-    updateDoc,
-    addDoc,
-    deleteDoc,
-    getDocs,
-    getDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        window.scheduleInterview = async (docId) => {
-    // Admin se date aur time pucha jayega
-    const dateTime = prompt("Enter Interview Date & Time (e.g., 25th Oct, 2:00 PM):");
-
-    // Agar admin cancel kar de ya khali chorde toh ruk jao
-    if (!dateTime || dateTime.trim() === "") {
-        return;
-    }
-
-    try {
-        const appRef = doc(db, "applications", docId);
-        
-        // Firestore mein status aur interview time update karna
-        await updateDoc(appRef, {
-            status: "Interview Scheduled",
-            interviewTime: dateTime // Ye user dashboard par dikhane ke kaam aayega
-        });
-
-        alert("Interview scheduled successfully! ✨");
-    } catch (err) {
-        console.error("Error scheduling interview:", err);
-        alert("Failed to schedule: " + err.message);
-    }
-};
         const firebaseConfig = {
             apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
             authDomain: "dunigo-977a6.firebaseapp.com",
@@ -208,12 +83,11 @@
 
         const ADMIN_EMAIL = "aayush3268@gmail.com";
 
-        // Auth Check
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else if (user.email !== ADMIN_EMAIL) {
-                document.getElementById("loadingScreen").innerHTML = `<h1 style="color:red">Access Denied</h1>`;
+                document.getElementById("loadingScreen").innerHTML = `<h1 style="color:red; font-size: 2rem;">Access Denied</h1><p>You are not authorized to view this portal.</p>`;
             } else {
                 document.getElementById("loadingScreen").style.display = "none";
                 document.getElementById("sidebar").style.display = "block";
@@ -221,17 +95,7 @@
                 loadApplications();
             }
         });
-        
 
-        // Switch Tabs
-        window.switchTab = (tabId) => {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        };
-
-        // Load Applications (Same as your old code)
         function loadApplications() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
                 const tbody = document.getElementById("appTableBody");
@@ -239,330 +103,77 @@
                 snapshot.forEach((snap) => {
                     const data = snap.data();
                     const tr = document.createElement("tr");
-                    let statusClass = data.status === "Rejected" ? "rejected" : (data.status === "Interview Scheduled" ? "scheduled" : "pending");
-                    loadJobs();
+                    
+                    let statusClass = "pending";
+                    if (data.status === "Rejected") statusClass = "rejected";
+                    if (data.status === "Interview Scheduled") statusClass = "scheduled";
 
-function loadJobs() {
-
-    onSnapshot(collection(db, "jobs"), (snapshot) => {
-
-        const container = document.getElementById("jobsContainer");
-
-        container.innerHTML = "";
-
-        snapshot.forEach((snap) => {
-
-            const data = snap.data();
-
-            const card = document.createElement("div");
-
-            card.style = `
-                background:#0f172a;
-                padding:20px;
-                border-radius:16px;
-                border:1px solid rgba(255,255,255,0.08);
-            `;
-
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; gap:20px; align-items:center;">
-
-                    <div>
-                        <h3 style="margin:0;">
-                            ${data.role}
-                        </h3>
-
-                        <p style="color:#94a3b8;">
-                            ${data.location}
-                        </p>
-                    </div>
-
-                    <div>
-
-                        <button class="view-btn"
-                            onclick="editJob('${snap.id}')">
-                            Edit
-                        </button>
-
-                        <button class="reject-btn"
-                            onclick="deleteJobById('${snap.id}')">
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>
-            `;
-
-            container.appendChild(card);
-
-        });
-
-    });
-
-}
+                    let formattedDate = "N/A";
+                    if (data.appliedAt) {
+                        const dateObj = data.appliedAt.toDate ? data.appliedAt.toDate() : new Date(data.appliedAt);
+                        formattedDate = dateObj.toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
                     
                     tr.innerHTML = `
-                        <td><b>${data.applicantName}</b><br><small>${data.applicantEmail}</small></td>
-                        <td>${data.jobRole}</td>
+                        <td><b>${data.applicantName || 'Unknown'}</b><br><small style="color:#94a3b8;">${data.applicantEmail || ''}</small></td>
+                        <td>${data.jobRole || 'N/A'}</td>
+                        <td><small style="color: #94a3b8;">${formattedDate}</small></td>
                         <td><span class="status-tag ${statusClass}">${data.status || 'Pending'}</span></td>
                         <td>
-    <button class="view-btn" onclick="openPDF('${data.resumeData}')">Resume</button>
-
-    <button class="view-btn"
-        style="margin-left:5px; background:#22c55e;"
-        onclick="scheduleInterview('${snap.id}')">
-        Schedule
-    </button>
-
-    <button class="reject-btn"
-        onclick="updateStatus('${snap.id}', 'Rejected')">
-        Reject
-    </button>
-</td>
+                            <div class="action-group">
+                                <button class="view-btn" style="background:#6366f1;" onclick="viewDetails('${snap.id}')">View Details</button>
+                                <button class="view-btn" onclick="openPDF('${data.resumeData}')">Resume</button>
+                                <button class="view-btn" style="background:#22c55e;" onclick="scheduleInterview('${snap.id}')">Schedule</button>
+                                <button class="reject-btn" onclick="updateStatus('${snap.id}', 'Rejected')">Reject</button>
+                            </div>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             });
         }
 
-        // POST JOB LOGIC
-        window.postJobToDB = async () => {
-            const btn = document.getElementById("postBtn");
-            const jobData = {
-                role: document.getElementById("jobRole").value,
-                location: document.getElementById("jobLoc").value,
-                description: document.getElementById("jobDesc").value,
-                responsibilities: document.getElementById("jobResp").value,
-                requirements: document.getElementById("jobReq").value,
-                type: document.getElementById("jobType").value,
-                salary: document.getElementById("jobSalary").value,
-                createdAt: serverTimestamp()
-            };
+        window.viewDetails = (docId) => {
+            if (!docId) return alert("Invalid Application ID");
+            window.location.href = `view.html?id=${docId}`;
+        };
 
-            if(!jobData.role || !jobData.description) return alert("Please fill Title and Description!");
-
-            btn.innerText = "Posting...";
-            btn.disabled = true;
-
+        window.scheduleInterview = async (docId) => {
+            const dateTime = prompt("Enter Interview Date & Time (e.g., 25th Oct, 2:00 PM):");
+            if (!dateTime || dateTime.trim() === "") return;
             try {
-                await addDoc(collection(db, "jobs"), jobData);
-                alert("Job Posted Successfully! 🚀");
-                location.reload(); // Refresh to clear form
+                await updateDoc(doc(db, "applications", docId), {
+                    status: "Interview Scheduled",
+                    interviewTime: dateTime
+                });
+                alert("Interview scheduled successfully! ✨");
             } catch (err) {
-                alert("Error: " + err.message);
-                btn.disabled = false;
+                alert("Failed to schedule: " + err.message);
+            }
+        };
+
+        window.updateStatus = async (id, status) => {
+            try {
+                await updateDoc(doc(db, "applications", id), { status: status });
+                alert(`Status updated to ${status}!`);
+            } catch (err) {
+                alert("Error updating status: " + err.message);
             }
         };
 
         window.openPDF = (base64) => {
+            if (!base64 || base64 === "undefined") return alert("No valid resume data found.");
             const win = window.open();
             win.document.write(`<iframe src="${base64}" frameborder="0" style="width:100%; height:100%;"></iframe>`);
         };
 
         window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
-
-        window.updateStatus = async (id, status) => {
-            await updateDoc(doc(db, "applications", id), { status: status });
-        };
-        window.openCreateForm = () => {
-
-    document.getElementById("jobFormContainer").style.display = "block";
-
-    document.getElementById("formTitle").innerText = "Create New Job";
-
-    document.getElementById("editingJobId").value = "";
-
-    clearForm();
-};
-
-window.clearForm = () => {
-
-    document.getElementById("jobRole").value = "";
-    document.getElementById("jobLoc").value = "";
-    document.getElementById("jobDesc").value = "";
-    document.getElementById("jobResp").value = "";
-    document.getElementById("jobReq").value = "";
-    document.getElementById("jobSalary").value = "";
-};
-
-window.saveJob = async () => {
-
-    const btn = document.getElementById("saveJobBtn");
-
-    const jobId = document.getElementById("editingJobId").value;
-
-    const jobData = {
-        role: document.getElementById("jobRole").value,
-        location: document.getElementById("jobLoc").value,
-        description: document.getElementById("jobDesc").value,
-        responsibilities: document.getElementById("jobResp").value,
-        requirements: document.getElementById("jobReq").value,
-        type: document.getElementById("jobType").value,
-        salary: document.getElementById("jobSalary").value,
-        updatedAt: serverTimestamp()
-    };
-
-    if (!jobData.role || !jobData.description) {
-        return alert("Fill required fields");
-    }
-
-    btn.innerText = "Saving...";
-    btn.disabled = true;
-
-    try {
-
-        if (jobId) {
-
-            await updateDoc(doc(db, "jobs", jobId), jobData);
-
-            alert("Job Updated Successfully");
-
-        } else {
-
-            jobData.createdAt = serverTimestamp();
-
-            await addDoc(collection(db, "jobs"), jobData);
-
-            alert("Job Posted Successfully");
-
-        }
-
-        clearForm();
-
-        document.getElementById("jobFormContainer").style.display = "none";
-
-    } catch (err) {
-
-        alert(err.message);
-
-    }
-
-    btn.innerText = "Save Job";
-    btn.disabled = false;
-};
-
-window.editJob = async (id) => {
-
-    const snap = await getDoc(doc(db, "jobs", id));
-
-    const data = snap.data();
-
-    document.getElementById("jobFormContainer").style.display = "block";
-
-document.getElementById("jobFormContainer").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-});
-
-    document.getElementById("formTitle").innerText = "Edit Job";
-
-    document.getElementById("editingJobId").value = id;
-
-    document.getElementById("jobRole").value = data.role;
-    document.getElementById("jobLoc").value = data.location;
-    document.getElementById("jobDesc").value = data.description;
-    document.getElementById("jobResp").value = data.responsibilities;
-    document.getElementById("jobReq").value = data.requirements;
-    document.getElementById("jobType").value = data.type;
-    document.getElementById("jobSalary").value = data.salary;
-
-};
-
-window.deleteJobById = async (id) => {
-
-    const confirmDelete = confirm("Delete this job?");
-
-    if (!confirmDelete) return;
-
-    try {
-
-        await deleteDoc(doc(db, "jobs", id));
-
-        alert("Job Deleted");
-
-    } catch (err) {
-
-        alert(err.message);
-
-    }
-
-};
-// --- Clear Form ---
-window.clearForm = () => {
-    document.getElementById("jobRole").value = "";
-    document.getElementById("jobLoc").value = "";
-    document.getElementById("jobDesc").value = "";
-    document.getElementById("jobResp").value = "";
-    document.getElementById("jobReq").value = "";
-    document.getElementById("jobNice").value = ""; // Naya field
-    document.getElementById("jobBenefits").value = ""; // Naya field
-    document.getElementById("jobSalary").value = "";
-    document.getElementById("editingJobId").value = "";
-};
-
-// --- Save Job (Create or Update) ---
-window.saveJob = async () => {
-    const btn = document.getElementById("saveJobBtn");
-    const jobId = document.getElementById("editingJobId").value;
-
-    const jobData = {
-        role: document.getElementById("jobRole").value,
-        location: document.getElementById("jobLoc").value,
-        description: document.getElementById("jobDesc").value,
-        responsibilities: document.getElementById("jobResp").value,
-        requirements: document.getElementById("jobReq").value,
-        niceToHave: document.getElementById("jobNice").value, // Naya data
-        benefits: document.getElementById("jobBenefits").value, // Naya data
-        type: document.getElementById("jobType").value,
-        salary: document.getElementById("jobSalary").value,
-        updatedAt: serverTimestamp()
-    };
-
-    if (!jobData.role || !jobData.description) return alert("Fill required fields!");
-
-    btn.innerText = "Processing...";
-    btn.disabled = true;
-
-    try {
-        if (jobId) {
-            await updateDoc(doc(db, "jobs", jobId), jobData);
-            alert("Job Updated Successfully!");
-        } else {
-            jobData.createdAt = serverTimestamp();
-            await addDoc(collection(db, "jobs"), jobData);
-            alert("New Job Posted!");
-        }
-        clearForm();
-        document.getElementById("jobFormContainer").style.display = "none";
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-    btn.innerText = "Save Job Posting";
-    btn.disabled = false;
-};
-
-// --- Edit Job (Fetch and Fill Form) ---
-window.editJob = async (id) => {
-    const snap = await getDoc(doc(db, "jobs", id));
-    const data = snap.data();
-
-    document.getElementById("jobFormContainer").style.display = "block";
-    document.getElementById("jobFormContainer").scrollIntoView({ behavior: "smooth" });
-
-    document.getElementById("formTitle").innerText = "Edit Job Posting";
-    document.getElementById("editingJobId").value = id;
-
-    // Filling values
-    document.getElementById("jobRole").value = data.role || "";
-    document.getElementById("jobLoc").value = data.location || "";
-    document.getElementById("jobDesc").value = data.description || "";
-    document.getElementById("jobResp").value = data.responsibilities || "";
-    document.getElementById("jobReq").value = data.requirements || "";
-    document.getElementById("jobNice").value = data.niceToHave || ""; // Fill naya field
-    document.getElementById("jobBenefits").value = data.benefits || ""; // Fill naya field
-    document.getElementById("jobType").value = data.type || "Full-time";
-    document.getElementById("jobSalary").value = data.salary || "";
-};
     </script>
 </body>
 </html>
