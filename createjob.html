@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Editor | Dunigo Logistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #020617; --primary: #0ea5e9; --border: rgba(255, 255, 255, 0.08); --card: #0f172a; }
+        body { background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--card); border-right: 1px solid var(--border); padding: 30px 20px; display: none; }
+        .sidebar h2 { font-size: 1.2rem; color: var(--primary); margin-bottom: 40px; }
+        .nav-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: none; background: transparent; color: #94a3b8; text-align: left; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; display: none; }
+
+        .job-form { max-width: 750px; background: var(--card); padding: 35px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #94a3b8; font-weight: 600; }
+        input, textarea, select { width: 100%; padding: 12px; background: #020617; border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; box-sizing: border-box; font-family: inherit; }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); }
+        
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: 800; width: 100%; margin-top: 10px; font-size: 1rem; transition: 0.2s; }
+        .submit-btn:hover { opacity: 0.9; }
+        .cancel-btn { background: transparent; color: #94a3b8; border: 1px solid var(--border); padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; margin-bottom: 20px; transition: 0.2s; }
+        .cancel-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+        /* Dynamic Field Styling */
+        .add-field-btn { background: rgba(14, 165, 233, 0.1); color: var(--primary); border: 1px dashed var(--primary); padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 5px; transition: 0.2s; }
+        .add-field-btn:hover { background: rgba(14, 165, 233, 0.2); }
+        .dynamic-question-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .remove-field-btn { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingScreen" style="padding: 50px; text-align: center; width: 100%;">
+        <h2>Verifying Security Credentials...</h2>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <h2>Dunigo Admin</h2>
+        <button class="nav-btn" onclick="window.location.href='admin.html'">Manage Applications</button>
+        <button class="nav-btn" onclick="window.location.href='job.html'">Manage Job Posting</button>
+        <button class="nav-btn" onclick="logout()" style="margin-top: 50px; color: #ef4444;">Logout</button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        
+        <a href="job.html" class="cancel-btn">← Back to Job List</a>
+
+        <div class="job-form">
+            <h1 id="formTitle" style="margin-top:0; margin-bottom: 25px; color: var(--primary);">Create Job</h1>
+            <input type="hidden" id="editingJobId">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="input-group">
+                    <label>Job Role / Title</label>
+                    <input type="text" id="jobRole" placeholder="e.g. Operations Manager">
+                </div>
+                <div class="input-group">
+                    <label>Location</label>
+                    <input type="text" id="jobLoc" placeholder="e.g. Delhi, India">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Job Description (Short Summary)</label>
+                <textarea id="jobDesc" rows="3" placeholder="Briefly describe the role..."></textarea>
+            </div>
+
+            <div class="input-group" style="border: 1px solid var(--border); padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.01);">
+                <label style="color: #f1f5f9; font-size: 1rem; margin-bottom: 4px;">Job-Specific Screening Questions</label>
+                <p style="color: #64748b; font-size: 0.8rem; margin: 0 0 15px 0;">Candidates will have to answer these text questions while applying on apply.html</p>
+                
+                <div id="questionsWrapper">
+                    </div>
+                
+                <button type="button" class="add-field-btn" onclick="addQuestionField()">+ Add Custom Question</button>
+            </div>
+
+            <div class="input-group">
+                <label>Key Responsibilities (One per line)</label>
+                <textarea id="jobResp" rows="4" placeholder="Manage daily shipments&#10;Coordinate with drivers"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Minimum Requirements (One per line)</label>
+                <textarea id="jobReq" rows="4" placeholder="3+ years experience&#10;Bachelor's degree"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Nice to Have / Preferred Skills (One per line)</label>
+                <textarea id="jobNice" rows="3" placeholder="Experience in E-commerce&#10;Multi-language proficiency"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Company Benefits & Perks (One per line)</label>
+                <textarea id="jobBenefits" rows="3" placeholder="Health Insurance&#10;Annual Performance Bonus"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Job Type & Salary Structure</label>
+                <div style="display:flex; gap:15px;">
+                    <select id="jobType" style="flex: 1;">
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+                    <input type="text" id="jobSalary" style="flex: 2;" placeholder="e.g. ₹40,000 - ₹60,000">
+                </div>
+            </div>
+
+            <button class="submit-btn" id="saveJobBtn" onclick="saveJob()">Save Job Posting</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+            authDomain: "dunigo-977a6.firebaseapp.com",
+            projectId: "dunigo-977a6",
+            appId: "1:728896139433:web:6b2026924b159fce7179b8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const ADMIN_EMAIL = "aayush3268@gmail.com";
+
+        const params = new URLSearchParams(window.location.search);
+        const editJobId = params.get('edit');
+
+        // Dynamic fields controller
+        window.addQuestionField = (value = "") => {
+            const wrapper = document.getElementById("questionsWrapper");
+            const div = document.createElement("div");
+            div.className = "dynamic-question-row";
+            div.innerHTML = `
+                <input type="text" class="custom-question-input" value="${value}" placeholder="e.g. Do you have your own bike/commercial vehicle?">
+                <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">✕</button>
+            `;
+            wrapper.appendChild(div);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else if (user.email !== ADMIN_EMAIL) {
+                document.getElementById("loadingScreen").innerHTML = `<h1 style="color:red; font-size: 2rem;">Access Denied</h1><p>You are not authorized to view this portal.</p>`;
+            } else {
+                document.getElementById("loadingScreen").style.display = "none";
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("mainContent").style.display = "block";
+                
+                if (editJobId) {
+                    prepareEditMode(editJobId);
+                }
+            }
+        });
+
+        async function prepareEditMode(id) {
+            try {
+                document.getElementById("formTitle").innerText = "Edit Job Posting";
+                document.getElementById("editingJobId").value = id;
+                
+                const snap = await getDoc(doc(db, "jobs", id));
+                if (!snap.exists()) return alert("Job not found!");
+                const data = snap.data();
+
+                document.getElementById("jobRole").value = data.role || "";
+                document.getElementById("jobLoc").value = data.location || "";
+                document.getElementById("jobDesc").value = data.description || "";
+                document.getElementById("jobResp").value = data.responsibilities || "";
+                document.getElementById("jobReq").value = data.requirements || "";
+                document.getElementById("jobNice").value = data.niceToHave || ""; 
+                document.getElementById("jobBenefits").value = data.benefits || ""; 
+                document.getElementById("jobType").value = data.type || "Full-time";
+                document.getElementById("jobSalary").value = data.salary || "";
+
+                // Dynamic values render on Edit mode
+                if (data.customQuestions && Array.isArray(data.customQuestions)) {
+                    data.customQuestions.forEach(q => addQuestionField(q));
+                }
+            } catch (err) {
+                alert("Error loading data: " + err.message);
+            }
+        }
+
+        window.saveJob = async () => {
+            const btn = document.getElementById("saveJobBtn");
+            const jobId = document.getElementById("editingJobId").value;
+
+            // Gathering dynamic questions array
+            const questionInputs = document.querySelectorAll(".custom-question-input");
+            const customQuestionsArray = [];
+            questionInputs.forEach(input => {
+                if (input.value.trim() !== "") {
+                    customQuestionsArray.push(input.value.trim());
+                }
+            });
+
+            const jobData = {
+                role: document.getElementById("jobRole").value,
+                location: document.getElementById("jobLoc").value,
+                description: document.getElementById("jobDesc").value,
+                responsibilities: document.getElementById("jobResp").value,
+                requirements: document.getElementById("jobReq").value,
+                niceToHave: document.getElementById("jobNice").value, 
+                benefits: document.getElementById("jobBenefits").value, 
+                type: document.getElementById("jobType").value,
+                salary: document.getElementById("jobSalary").value,
+                customQuestions: customQuestionsArray, // Adding Array safely to db
+                updatedAt: serverTimestamp()
+            };
+
+            if (!jobData.role || !jobData.description) return alert("Please fill Title and Description fields!");
+
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+
+            try {
+                if (jobId) {
+                    await updateDoc(doc(db, "jobs", jobId), jobData);
+                    alert("Job Updated Successfully! 🚀");
+                } else {
+                    jobData.createdAt = serverTimestamp();
+                    await addDoc(collection(db, "jobs"), jobData);
+                    alert("Job Posted Successfully! 🚀");
+                }
+                window.location.href = "job.html";
+            } catch (err) {
+                alert("Error processing: " + err.message);
+                btn.innerText = "Save Job Posting";
+                btn.disabled = false;
+            }
+        };
+
+        window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
+    </script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Details | Dunigo Logistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #0ea5e9;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-dim: #94a3b8;
+        }
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            background-image: radial-gradient(circle at 50% 0%, #0c4a6e 0%, transparent 50%);
+            min-height: 100vh;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .back-link {
+            color: var(--text-dim);
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+        }
+        .back-link:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <div class="max-w-3xl mx-auto">
+        <div class="mb-6">
+            <a href="admin.html" class="back-link inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Admin Panel
+            </a>
+        </div>
+
+        <div id="loadingState" class="glass-card rounded-3xl p-12 text-center text-gray-400 font-medium">
+            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-sky-500 rounded-full mb-4" role="status"></div>
+            <p id="loadingText">Verifying Admin Authentication...</p>
+        </div>
+
+        <div id="mainDetailsCard" class="hidden glass-card rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-8 border-b border-[rgba(255,255,255,0.08)] bg-gradient-to-r from-slate-900/50 to-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-semibold text-sky-400 uppercase tracking-widest">Application Details</span>
+                    <h1 id="viewJobRole" class="text-2xl md:text-3xl font-extrabold mt-1 text-white">Loading Role...</h1>
+                </div>
+                <div>
+                    <span id="viewStatus" class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                        Pending
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-8 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Full Name</label>
+                        <p id="viewName" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5">-</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Email Address</label>
+                        <p id="viewEmail" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5 break-all">-</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Phone Number</label>
+                        <p id="viewPhone" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5">-</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Preferred Job Location</label>
+                        <p id="viewLocation" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5">-</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Experience</label>
+                        <p id="viewExperience" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5">-</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Notice Period</label>
+                        <p id="viewNotice" class="text-lg font-semibold text-slate-100 bg-white/5 p-3.5 rounded-xl border border-white/5">-</p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-medium text-slate-400 block mb-1">Applied On</label>
+                        <p id="viewAppliedOn" class="text-lg font-semibold text-sky-400 bg-white/5 p-3.5 rounded-xl border border-sky-500/10">-</p>
+                    </div>
+
+                    <div id="interviewBox" class="hidden md:col-span-2 bg-sky-500/5 border border-sky-500/20 p-4 rounded-xl">
+                        <label class="text-xs font-medium text-sky-400 block mb-1">Scheduled Interview Time</label>
+                        <p id="viewInterviewTime" class="text-lg font-bold text-sky-300">-</p>
+                    </div>
+                </div>
+
+                <div id="screeningCard" class="hidden border border-[rgba(255,255,255,0.08)] bg-white/[0.02] p-6 rounded-2xl">
+                    <div class="text-sky-400 font-extrabold text-sm uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+                        Screening Responses
+                    </div>
+                    <div id="screeningResponsesContainer" class="space-y-4"></div>
+                </div>
+
+                <div class="pt-4 border-t border-[rgba(255,255,255,0.08)]">
+                    <label class="text-xs font-medium text-slate-400 block mb-2">Submitted Resume (PDF)</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="downloadResumeBtn" class="flex-1 bg-white hover:bg-sky-500 hover:text-white text-slate-950 font-bold p-4 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            Download Resume PDF
+                        </button>
+                        <button id="viewResumeBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold p-4 rounded-xl border border-white/10 transition flex items-center justify-center gap-2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview Resume
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorState" class="hidden glass-card rounded-3xl p-12 text-center border-red-500/20">
+            <svg class="mx-auto text-red-500 mb-4" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p class="text-red-400 font-semibold text-lg">Access Denied / Error!</p>
+            <p id="errorSystemDetails" class="text-slate-400 text-sm mt-2 p-3 bg-red-950/30 rounded-xl border border-red-900/30 font-mono text-left break-all">
+                Checking authentication session...
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJTyCo2IbqTNa06LHngcrcukxvGn0o72s",
+            authDomain: "dunigo-977a6.firebaseapp.com",
+            projectId: "dunigo-977a6",
+            appId: "1:728896139433:web:6b2026924b159fce7179b8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const params = new URLSearchParams(window.location.search);
+        const applicationId = params.get('id');
+
+        function openBase64PDF(base64String) {
+            try {
+                const parts = base64String.split(';base64,');
+                const contentType = parts[0].split(':')[1];
+                const raw = window.atob(parts[1]);
+                const rawLength = raw.length;
+                const uInt8Array = new Uint8Array(new ArrayBuffer(rawLength));
+
+                for (let i = 0; i < rawLength; ++i) {
+                    uInt8Array[i] = raw.charCodeAt(i);
+                }
+
+                const blob = new Blob([uInt8Array], { type: contentType });
+                const blobUrl = URL.createObjectURL(blob);
+                window.open(blobUrl, '_blank');
+            } catch (e) {
+                alert("Error rendering resume: " + e.message);
+            }
+        }
+
+        // Auth Observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email === "aayush3268@gmail.com") {
+                    document.getElementById('loadingText').innerText = "Fetching applicant profile from Dunigo Cloud...";
+                    loadApplicationDetails();
+                } else {
+                    showError("Unauthorized Access: Aapki email ID ko is data ko dekhne ki permission nahi hai.");
+                }
+            } else {
+                showError("Authentication Required: Kripya pehle Admin Panel par jaakar login karein.");
+            }
+        });
+
+        async function loadApplicationDetails() {
+            if (!applicationId) {
+                showError("Error: URL mein '?id=' parameter missing hai.");
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "applications", applicationId.trim());
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // Fields Mapping
+                    document.getElementById('viewJobRole').innerText = data.jobRole || "N/A";
+                    document.getElementById('viewName').innerText = data.applicantName || "N/A";
+                    document.getElementById('viewEmail').innerText = data.applicantEmail || "N/A";
+                    document.getElementById('viewPhone').innerText = data.phone || "N/A";
+                    document.getElementById('viewLocation').innerText = data.preferredLocation || "N/A";
+                    
+                    document.getElementById('viewExperience').innerText = data.experience ? `${data.experience} Years` : "Freshers / No Exp";
+                    document.getElementById('viewNotice').innerText = data.noticePeriod ? `${data.noticePeriod} Days` : "0 Days (Immediate)";
+                    
+                    // Mapping exactly to 'appliedAt' from database
+                    const dateValue = data.appliedAt;
+                    if (dateValue) {
+                        if (dateValue.seconds) {
+                            const dateObj = new Date(dateValue.seconds * 1000);
+                            document.getElementById('viewAppliedOn').innerText = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                        } else {
+                            const dateObj = new Date(dateValue);
+                            if (!isNaN(dateObj)) {
+                                document.getElementById('viewAppliedOn').innerText = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                            } else {
+                                document.getElementById('viewAppliedOn').innerText = dateValue;
+                            }
+                        }
+                    } else {
+                        document.getElementById('viewAppliedOn').innerText = "N/A (Date not captured)";
+                    }
+
+                    // --- NEW LOGIC: RENDER SCREENING RESPONSES ---
+                    const screeningCard = document.getElementById("screeningCard");
+                    const responsesContainer = document.getElementById("screeningResponsesContainer");
+                    responsesContainer.innerHTML = ""; // Container clear karein
+
+                    if (data.screeningResponses && data.screeningResponses.length > 0) {
+                        screeningCard.classList.remove("hidden"); // Card show karein Tailwind ke sath
+
+                        data.screeningResponses.forEach((item, index) => {
+                            const row = document.createElement("div");
+                            row.className = "p-3.5 bg-white/5 rounded-xl border border-white/5 space-y-1";
+                            row.innerHTML = `
+                                <p class="text-xs font-semibold text-slate-400">Q${index + 1}: ${item.question}</p>
+                                <p class="text-base font-medium text-slate-100 break-words">${item.answer || '<span class="text-slate-500 italic">No response</span>'}</p>
+                            `;
+                            responsesContainer.appendChild(row);
+                        });
+                    } else {
+                        screeningCard.classList.add("hidden"); // Agar questions nahi hain toh container hide hi rahega
+                    }
+
+                    // Status Badge
+                    const statusEl = document.getElementById('viewStatus');
+                    const currentStatus = data.status || "Pending"; 
+                    statusEl.innerText = currentStatus;
+
+                    if (currentStatus === "Interview Scheduled" || currentStatus === "Approved") {
+                        statusEl.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    } else if (currentStatus === "Rejected") {
+                        statusEl.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20";
+                    } else {
+                        statusEl.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
+                    }
+
+                    if (data.interviewTime) {
+                        document.getElementById('interviewBox').classList.remove('hidden');
+                        document.getElementById('viewInterviewTime').innerText = data.interviewTime;
+                    } else {
+                        document.getElementById('interviewBox').classList.add('hidden');
+                    }
+
+                    // Resume Actions
+                    if (data.resumeData && data.resumeData.includes("base64,")) {
+                        document.getElementById('downloadResumeBtn').onclick = () => {
+                            const link = document.createElement('a');
+                            link.href = data.resumeData;
+                            link.download = `Resume_${(data.applicantName || 'Candidate').replace(/\s+/g, '_')}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        };
+
+                        document.getElementById('viewResumeBtn').onclick = () => {
+                            openBase64PDF(data.resumeData);
+                        };
+                    } else {
+                        const dBtn = document.getElementById('downloadResumeBtn');
+                        const vBtn = document.getElementById('viewResumeBtn');
+                        [dBtn, vBtn].forEach(b => {
+                            b.disabled = true;
+                            b.innerText = "No Resume Uploaded";
+                            b.className = "flex-1 bg-slate-900/50 text-slate-600 font-bold p-4 rounded-xl cursor-not-allowed text-center text-sm border border-white/5";
+                        });
+                    }
+
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('mainDetailsCard').classList.remove('hidden');
+
+                } else {
+                    showError(`Document ID "${applicationId}" database mein nahi mili.`);
+                }
+            } catch (error) {
+                console.error("Firestore Error: ", error);
+                showError(`Firebase Error: ${error.message}`);
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('mainDetailsCard').classList.add('hidden');
+            document.getElementById('errorSystemDetails').innerText = msg;
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
